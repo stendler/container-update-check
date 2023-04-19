@@ -1,14 +1,28 @@
 #!/usr/bin/env sh
 
-# podman or docker
-CONTAINER_CMD="${CONTAINER_CMD:=podman}"
+# podman or docker if not explicitly specified
+if which podman 1>/dev/null; then
+    CONTAINER_CMD="${CONTAINER_CMD:=podman}"
+elif which docker 1>/dev/null; then
+    CONTAINER_CMD="${CONTAINER_CMD:=docker}"
+fi
 
-if [ "$1" == "--docker" ]; then
-    CONTAINER_CMD="docker"
-    shift
-elif [ "$1" == "--podman" ]; then
-    CONTAINER_CMD="podman"
-    shift
+OPTS=$(getopt --options t: --longoptions docker,podman,ntfy-topic:,ntfy-email:,ntfy-urls: -- "$@")
+eval set -- "$OPTS"
+while true; do
+    case "$1" in
+        -t|--ntfy-topic) NTFY_TOPIC="$2"; shift 2;;
+        --ntfy-email) NTFY_EMAIL="$2"; shift 2;;
+        --ntfy-url) NTFY_URL="$2"; shift 2;;
+        --podman) which podman 1>/dev/null && CONTAINER_CMD="podman" || exit 1; shift;;
+        --docker) which docker 1>/dev/null && CONTAINER_CMD="docker" || exit 1; shift;;
+        --) shift; break;;
+    esac
+done
+
+if [ -z "${CONTAINER_CMD}" ]; then
+    echo 1>&2 "Neither podman nor docker present and no CONTAINER_CMD set."
+    exit 1
 fi
 
 # optional socket url, in case this script is running in a container
