@@ -52,3 +52,5 @@ for container in $($CONTAINER_CMD container ls -a --format '{{ .ID }}'); do
     # updatecheck label is set, assuming we want to check for an update
     ./image-check-update.sh "$image_repo" "$image_tag" "$remote_tag"
 done
+
+exit 0
