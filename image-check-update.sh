@@ -7,7 +7,7 @@ elif which docker 1>/dev/null; then
     CONTAINER_CMD="${CONTAINER_CMD:=docker}"
 fi
 
-OPTS=$(getopt --options t: --longoptions docker,podman,ntfy-topic:,ntfy-email:,ntfy-urls: -- "$@")
+OPTS=$(getopt --options qt: --longoptions quiet,docker,podman,ntfy-topic:,ntfy-email:,ntfy-urls: -- "$@")
 eval set -- "$OPTS"
 while true; do
     case "$1" in
@@ -16,6 +16,7 @@ while true; do
         --ntfy-url) NTFY_URL="$2"; shift 2;;
         --podman) which podman 1>/dev/null && CONTAINER_CMD="podman" || exit 1; shift;;
         --docker) which docker 1>/dev/null && CONTAINER_CMD="docker" || exit 1; shift;;
+        -q|--quiet) quiet=true; shift;; # still printing to stderr, but not to stdout
         --) shift; break;;
     esac
 done
@@ -72,17 +73,22 @@ done
 if [ "$remote_tag" == "$image_tag" ]; then
     echo >&2 "$1:$image_tag can be updated."
 else
-    echo >&2 "$1:$image_tag is not up-to-date with tag $remote_tag. These tags could be newer:"
-    tag_list=$(skopeo list-tags "docker://$repo" | jq ".Tags as \$tags | \$tags | index(\"${image_tag}\") as \$start | \$tags[\$start+1:]")
+    echo >&2 "$1:$image_tag is not up-to-date with tag $remote_tag."
+    if [ -z "$quiet" ]; then
+        echo >&2 "These tags could be newer:"
+        # get the list of tags starting from the image_tag
+        tag_list=$(skopeo list-tags "docker://$repo" | jq ".Tags as \$tags | \$tags | index(\"${image_tag}\") as \$start | \$tags[\$start+1:]")
+        echo "$tag_list"
+    fi
     if [ -n "$NTFY_TOPIC" ]; then
         if [ -n "$NTFY_EMAIL" ]; then
             NTFY_EMAIL="Email: $NTFY_EMAIL"
             ntfy_mail_header="-H"
         fi
+        test -z "$quiet" && message="Possible update candidates: $tag_list"
         curl >/dev/null 2>&1 -H "Tags: whale" -H "Firebase: no" "$ntfy_mail_header" "$NTFY_EMAIL" \
             -H "Title: $(whoami)@$(hostname): $repo:$image_tag is outdated compared to $remote_tag" \
-            -d "Possible update candidates: $tag_list" "${NTFY_URL:=https://ntfy.sh/}$NTFY_TOPIC"
+            -d "$message" "${NTFY_URL:=https://ntfy.sh/}$NTFY_TOPIC"
     fi
-    echo "$tag_list"
 fi
 exit 2
