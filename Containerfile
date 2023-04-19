@@ -1,6 +1,6 @@
 FROM quay.io/podman/stable
 
-ENTRYPOINT [ "/usr/bin/container-check-update" ]
+ENTRYPOINT [ "/image-check-update.sh" ]
 
 ENV SOCKET_URL=unix:///run/podman/podman.sock
 ENV NTFY_URL=https://ntfy.sh/
@@ -9,4 +9,4 @@ ENV NTFY_URL=https://ntfy.sh/
 
 RUN dnf update
 RUN dnf install -y jq podman skopeo curl
-COPY container-check-update.sh /usr/bin/container-check-update
+COPY image-check-update.sh /

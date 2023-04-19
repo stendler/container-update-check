@@ -50,5 +50,5 @@ for container in $($CONTAINER_CMD container ls -a --format '{{ .ID }}'); do
     ntfy_email=$(echo $container_info | jq -r ".[0].Config.Labels[${CONTAINER_UPDATE_LABEL}.ntfy.email]" 2>/dev/null)
 
     # updatecheck label is set, assuming we want to check for an update
-    ./container-check-update.sh "$image_repo" "$image_tag" "$remote_tag"
+    ./image-check-update.sh "$image_repo" "$image_tag" "$remote_tag"
 done
