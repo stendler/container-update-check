@@ -39,7 +39,10 @@ if [ -z "$local_digest" ]; then
     echo >&2 "No local image exists with this tag. Check $CONAINER_CMD image ls"
     exit 1
 fi
-remote_digest=$(skopeo inspect "docker://$repo:$remote_tag" | jq '.Digest')
+remote_digest=$((skopeo inspect "docker://$repo:$remote_tag") | jq '.Digest')
+if [ -z "$remote_digest" ]; then
+    exit 1 # no error message needed, was probably already printed to stderr
+fi
 
 if [ "$remote_digest" == "$local_digest" ]; then
     if [ "$remote_tag" == "$image_tag" ]; then
