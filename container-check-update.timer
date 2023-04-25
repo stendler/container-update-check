@@ -1,0 +1,11 @@
+[Unit]
+Description=Daily container update check
+
+[Timer]
+OnCalendar=*-*-* 19:00:00
+AccuracySec=1h
+RandomizedDelaySec=5m
+#Persistent=true
+
+[Install]
+WantedBy=timers.target
