@@ -9,6 +9,8 @@ RequiresMountsFor=%t/containers
 Type=oneshot
 ExecStart=/usr/bin/podman run --rm \
     --volume=%t/podman:/run/podman:z \
+    --env=NTFY_USER=%u \
+    --env=NTFY_HOSTNAME=%H \
     --log-driver=journald \
     --security-opt label=disable \
     localhost/container-check-update

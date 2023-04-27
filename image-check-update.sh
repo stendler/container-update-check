@@ -90,7 +90,7 @@ else
         fi
         test -z "$quiet" && message="Possible update candidates: $tag_list"
         curl >/dev/null 2>&1 -H "Tags: whale" -H "Firebase: no" "$ntfy_mail_header" "$NTFY_EMAIL" \
-            -H "Title: $(whoami)@$(hostname): $repo:$image_tag is outdated compared to $remote_tag" \
+            -H "Title: ${NTFY_USER:=$(whoami)}@${NTFY_HOSTNAME:=$(hostname)}: $repo:$image_tag is outdated compared to $remote_tag" \
             -d "$message" "${NTFY_URL:=https://ntfy.sh/}$NTFY_TOPIC"
     fi
 fi
