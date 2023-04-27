@@ -83,15 +83,18 @@ else
         tag_list=$(skopeo list-tags "docker://$repo" | jq ".Tags as \$tags | \$tags | index(\"${image_tag}\") as \$start | \$tags[\$start+1:]")
         echo "$tag_list"
     fi
-    if [ -n "$NTFY_TOPIC" ]; then
-        if [ -n "$NTFY_EMAIL" ]; then
-            NTFY_EMAIL="Email: $NTFY_EMAIL"
-            ntfy_mail_header="-H"
-        fi
-        test -z "$quiet" && message="Possible update candidates: $tag_list"
-        curl >/dev/null 2>&1 -H "Tags: whale" -H "Firebase: no" "$ntfy_mail_header" "$NTFY_EMAIL" \
-            -H "Title: ${NTFY_USER:=$(whoami)}@${NTFY_HOSTNAME:=$(hostname)}: $repo:$image_tag is outdated compared to $remote_tag" \
-            -d "$message" "${NTFY_URL:=https://ntfy.sh/}$NTFY_TOPIC"
-    fi
+    test -z "$quiet" && message="Possible update candidates: $tag_list"
 fi
+
+if [ -n "$NTFY_TOPIC" ]; then
+    if [ -n "$NTFY_EMAIL" ]; then
+        NTFY_EMAIL="Email: $NTFY_EMAIL"
+        ntfy_mail_header="-H"
+    fi
+
+    curl >/dev/null 2>&1 -H "Tags: whale" -H "Firebase: no" "$ntfy_mail_header" "$NTFY_EMAIL" \
+    -H "Title: ${NTFY_USER:=$(whoami)}@${NTFY_HOSTNAME:=$(hostname)}: $repo:$image_tag is outdated compared to remote tag '$remote_tag'" \
+    -d "$message" "${NTFY_URL:=https://ntfy.sh/}$NTFY_TOPIC"
+fi
+
 exit 2
