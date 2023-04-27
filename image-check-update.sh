@@ -7,7 +7,7 @@ elif which docker 1>/dev/null; then
     CONTAINER_CMD="${CONTAINER_CMD:=docker}"
 fi
 
-OPTS=$(getopt --options qt: --longoptions quiet,docker,podman,ntfy-topic:,ntfy-email:,ntfy-urls: -- "$@")
+OPTS=$(getopt --options qt: --longoptions quiet,docker,podman,ntfy-topic:,ntfy-email:,ntfy-url: -- "$@")
 eval set -- "$OPTS"
 while true; do
     case "$1" in
@@ -18,6 +18,7 @@ while true; do
         --docker) which docker 1>/dev/null && CONTAINER_CMD="docker" || exit 1; shift;;
         -q|--quiet) quiet=true; shift;; # still printing to stderr, but not to stdout
         --) shift; break;;
+        *) echo "Unkown argument: $1"; exit 1;;
     esac
 done
 
