@@ -1,9 +1,11 @@
 #!/usr/bin/env sh
 
+#set -x
+
 # podman or docker if not explicitly specified
-if which podman 1>/dev/null; then
+if command -v podman 1>/dev/null; then
     CONTAINER_CMD="${CONTAINER_CMD:=podman}"
-elif which docker 1>/dev/null; then
+elif command -v docker 1>/dev/null; then
     CONTAINER_CMD="${CONTAINER_CMD:=docker}"
 fi
 
@@ -14,8 +16,8 @@ while true; do
         -t|--ntfy-topic) NTFY_TOPIC="$2"; shift 2;;
         --ntfy-email) NTFY_EMAIL="$2"; shift 2;;
         --ntfy-url) NTFY_URL="$2"; shift 2;;
-        --podman) which podman 1>/dev/null && CONTAINER_CMD="podman" || exit 1; shift;;
-        --docker) which docker 1>/dev/null && CONTAINER_CMD="docker" || exit 1; shift;;
+        --podman) command -v podman 1>/dev/null && CONTAINER_CMD="podman" || exit 1; shift;;
+        --docker) command -v docker 1>/dev/null && CONTAINER_CMD="docker" || exit 1; shift;;
         -q|--quiet) quiet=true; shift;; # still printing to stderr, but not to stdout
         --) shift; break;;
         *) echo "Unkown argument: $1"; exit 1;;
