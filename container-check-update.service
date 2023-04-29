@@ -11,7 +11,7 @@ ExecStart=/usr/bin/podman run --rm \
     --volume=%t/podman:/run/podman:z \
     --env=NTFY_USER=%u \
     --env=NTFY_HOSTNAME=%H \
-    --log-driver=journald \
+#    --log-driver=journald \
     --security-opt label=disable \
     localhost/container-check-update
 SuccessExitStatus=0 2
