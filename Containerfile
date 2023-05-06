@@ -1,5 +1,7 @@
 FROM quay.io/podman/stable
 
+LABEL RUN podman run --rm --volume \$XDG_RUNTIME_DIR/podman:/run/podman:z --env NTFY_USER=\$USER --env NTFY_HOSTNAME=\$HOST -security-opt label=disable IMAGE
+
 ENTRYPOINT [ "/containers-check-update.sh" ]
 
 ENV SOCKET_URL=unix:///run/podman/podman.sock
