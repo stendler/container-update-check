@@ -54,7 +54,7 @@ fi
 
 local_digests=$($CONTAINER_CMD image inspect "$repo:$image_tag" | jq -r '.[0].RepoDigests | join(" ")' | sed -e 's/[a-z0-9\./_-]*@//g')
 if [ -z "$local_digests" ]; then
-    echo >&2 "No local image exists with this tag. Check $CONAINER_CMD image ls"
+    echo >&2 "No local image exists with this tag. Check $CONTAINER_CMD image ls"
     exit 1
 fi
 remote_digest=$(skopeo inspect "docker://$repo:$remote_tag" | jq -r '.Digest')
@@ -73,6 +73,10 @@ for digest in $local_digests; do
     fi
 done
 
+# declare locally used variables
+declare message
+declare ntfy_mail_header
+
 if [ "$remote_tag" == "$image_tag" ]; then
     echo >&2 "$1:$image_tag can be updated."
 else
@@ -82,8 +86,8 @@ else
         # get the list of tags starting from the image_tag
         tag_list=$(skopeo list-tags "docker://$repo" | jq ".Tags as \$tags | \$tags | index(\"${image_tag}\") as \$start | \$tags[\$start+1:]")
         echo "$tag_list"
+        message="Possible update candidates: $tag_list"
     fi
-    test -z "$quiet" && message="Possible update candidates: $tag_list"
 fi
 
 if [ -n "$NTFY_TOPIC" ]; then
@@ -94,7 +98,7 @@ if [ -n "$NTFY_TOPIC" ]; then
 
     curl >/dev/null 2>&1 -H "Tags: whale" -H "Firebase: no" "$ntfy_mail_header" "$NTFY_EMAIL" \
     -H "Title: ${NTFY_USER:=$(whoami)}@${NTFY_HOSTNAME:=$(hostname)}: $repo:$image_tag is outdated compared to remote tag '$remote_tag'" \
-    -d "$message" "${NTFY_URL:=https://ntfy.sh/}$NTFY_TOPIC"
+    -d "$message" "${NTFY_URL:=https://ntfy.sh}/$NTFY_TOPIC"
 fi
 
 exit 2

@@ -5,7 +5,7 @@ LABEL RUN podman run --rm --volume \$XDG_RUNTIME_DIR/podman:/run/podman:z --env 
 ENTRYPOINT [ "/containers-check-update.sh" ]
 
 ENV SOCKET_URL=unix:///run/podman/podman.sock
-ENV NTFY_URL=https://ntfy.sh/
+ENV NTFY_URL=https://ntfy.sh
 #set NTFY_TOPIC if you want to utilise ntfy
 #set NTFY_EMAIL if you want to additionally get notified on this email
 
