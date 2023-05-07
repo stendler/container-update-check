@@ -1,5 +1,26 @@
 #!/usr/bin/env sh
 
+###########################################################################
+# PROGRAM:
+#    Check if a local image tag differs from a remote tag, printing
+#    possible newer tags and optionally sending a notification.
+###########################################################################
+#    Copyright (C) 2023 stendler
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+###########################################################################
+
 #set -x
 
 # podman or docker if not explicitly specified

@@ -1,9 +1,27 @@
 #!/usr/bin/env sh
 
-#set -x
+###########################################################################
+# PROGRAM:
+#    Check for all containers with specific labels, if their image tag
+#    differ from a remote tag (configurable via labels).
+###########################################################################
+#    Copyright (C) 2023 stendler
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+###########################################################################
 
-# check all containers for a label and run the update check for all of them.
-# additional configuration can be provided via ENV or even as a label.
+#set -x
 
 OPTS=$(getopt --options f --longoptions force,latest -- "$@")
 eval set -- "$OPTS"
