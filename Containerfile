@@ -9,7 +9,9 @@ ENV NTFY_URL=https://ntfy.sh
 #set NTFY_TOPIC if you want to utilise ntfy
 #set NTFY_EMAIL if you want to additionally get notified on this email
 
-RUN dnf update -y
-RUN dnf install -y jq podman skopeo curl
+RUN dnf update -y && \
+    dnf install -y jq podman skopeo curl --exclude container-selinux && \
+    dnf clean all && \
+    rm -rf /var/cache /var/log/dnf* /var/log/yum.*
 COPY image-check-update.sh /
 COPY containers-check-update.sh /
