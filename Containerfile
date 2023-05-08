@@ -9,7 +9,8 @@ ENV NTFY_URL=https://ntfy.sh
 #set NTFY_TOPIC if you want to utilise ntfy
 #set NTFY_EMAIL if you want to additionally get notified on this email
 
-RUN dnf update -y && \
+RUN echo "max_parallel_downloads=20" >> /etc/dnf/dnf.conf && \
+    dnf upgrade --refresh -y && \
     dnf install -y jq podman skopeo curl --exclude container-selinux && \
     dnf clean all && \
     rm -rf /var/cache /var/log/dnf* /var/log/yum.*
