@@ -13,7 +13,7 @@ ExecStart=/usr/bin/podman run --rm \
     --env=NTFY_HOSTNAME=%H \
 #    --log-driver=journald \
     --security-opt label=disable \
-    localhost/container-check-update
+    ghcr.io/stendler/container-update-check
 SuccessExitStatus=0 2
 
 # Hardening
