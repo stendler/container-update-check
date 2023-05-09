@@ -10,6 +10,12 @@ ENV NTFY_URL=https://ntfy.sh
 #set NTFY_EMAIL if you want to additionally get notified on this email
 
 RUN echo "max_parallel_downloads=20" >> /etc/dnf/dnf.conf && \
+    sed -i 's/enabled=1/enabled=0/' /etc/yum.repos.d/fedora-cisco-openh264.repo && \
+    sed -i 's/enabled=1/enabled=0/' /etc/yum.repos.d/fedora-modular.repo && \
+    sed -i 's/enabled=1/enabled=0/' /etc/yum.repos.d/fedora-updates-modular.repo && \
+    sed -i 's/enabled=1/enabled=0/' /etc/yum.repos.d/fedora-updates-testing-modular.repo && \
+    sed -i 's/enabled=1/enabled=0/' /etc/yum.repos.d/fedora-updates-testing.repo && \
+    sed -i 's/enabled=1/enabled=0/' /etc/yum.repos.d/fedora-updates-modular.repo && \
     dnf upgrade --refresh -y && \
     dnf install -y jq podman skopeo curl --exclude container-selinux && \
     dnf clean all && \
