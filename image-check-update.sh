@@ -52,13 +52,13 @@ fi
 
 # optional socket url, in case this script is running in a container
 if [ -n "$SOCKET_URL" ]; then
-    if [ "$CONTAINER_CMD" == "podman" ]; then
+    if [ "$CONTAINER_CMD" = "podman" ]; then
         CONTAINER_CMD="podman --url=$SOCKET_URL"
     fi
 fi
 
 if [ -z "$1" ]; then
-    echo >&2 "Image repository url (including e.g. "docker.io/") must be specified."
+    echo >&2 "Image repository url (including e.g. \"docker.io/\") must be specified."
     exit 1
 fi
 repo="$1"
@@ -88,8 +88,8 @@ fi
 local_inspect=$(skopeo inspect "docker://$repo@$local_digest")
 local_layers=$(echo "$local_inspect" | jq -r '.Layers')
 
-if [ "$remote_layers" == "$local_layers" ]; then
-    if [ "$remote_tag" == "$image_tag" ]; then
+if [ "$remote_layers" = "$local_layers" ]; then
+    if [ "$remote_tag" = "$image_tag" ]; then
         echo >&2 "$1:$image_tag is up-to-date"
     else
         echo >&2 "$1:$image_tag is up-to-date with tag $remote_tag"
@@ -98,10 +98,10 @@ if [ "$remote_layers" == "$local_layers" ]; then
 fi
 
 # declare locally used variables
-declare message
-declare ntfy_mail_header
+message=""
+ntfy_mail_header=""
 
-if [ "$remote_tag" == "$image_tag" ]; then
+if [ "$remote_tag" = "$image_tag" ]; then
     echo >&2 "$1:$image_tag can be updated."
 else
     echo >&2 "$1:$image_tag is not up-to-date with tag $remote_tag."
