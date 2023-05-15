@@ -73,26 +73,29 @@ if [ -n "$3" ]; then
     remote_tag="$3"
 fi
 
-local_digests=$($CONTAINER_CMD image inspect "$repo:$image_tag" | jq -r '.[0].RepoDigests | join(" ")' | sed -e 's/[a-z0-9\./_-]*@//g')
-if [ -z "$local_digests" ]; then
+local_digest=$($CONTAINER_CMD image inspect "$repo:$image_tag" | jq -r '.[0].Digest')
+if [ -z "$local_digest" ]; then
     echo >&2 "No local image exists with this tag. Check $CONTAINER_CMD image ls"
     exit 1
 fi
-remote_digest=$(skopeo inspect "docker://$repo:$remote_tag" | jq -r '.Digest')
-if [ -z "$remote_digest" ]; then
+remote_inspect=$(skopeo inspect "docker://$repo:$remote_tag")
+remote_layers=$(echo "$remote_inspect" | jq -r '.Layers')
+if [ -z "$remote_layers" ]; then
     exit 1 # no error message needed, was probably already printed to stderr
 fi
 
-for digest in $local_digests; do
-    if [ "$remote_digest" == "$digest" ]; then
-        if [ "$remote_tag" == "$image_tag" ]; then
-            echo >&2 "$1:$image_tag is up-to-date"
-        else
-            echo >&2 "$1:$image_tag is up-to-date with tag $remote_tag"
-        fi
-        exit 0
+# this may throw an error if the manifest does not exist on the remote anymore - but that means, an update is probably available
+local_inspect=$(skopeo inspect "docker://$repo@$local_digest")
+local_layers=$(echo "$local_inspect" | jq -r '.Layers')
+
+if [ "$remote_layers" == "$local_layers" ]; then
+    if [ "$remote_tag" == "$image_tag" ]; then
+        echo >&2 "$1:$image_tag is up-to-date"
+    else
+        echo >&2 "$1:$image_tag is up-to-date with tag $remote_tag"
     fi
-done
+    exit 0
+fi
 
 # declare locally used variables
 declare message
@@ -105,7 +108,7 @@ else
     if [ -z "$quiet" ]; then
         echo >&2 "These tags could be newer:"
         # get the list of tags starting from the image_tag
-        tag_list=$(skopeo list-tags "docker://$repo" | jq ".Tags as \$tags | \$tags | index(\"${image_tag}\") as \$start | \$tags[\$start+1:]")
+        tag_list=$(echo "$remote_inspect" | jq ".RepoTags as \$tags | \$tags | index(\"${image_tag}\") as \$start | \$tags[\$start+1:]")
         echo "$tag_list"
         message="Possible update candidates: $tag_list"
     fi
