@@ -14,6 +14,7 @@ Additionally, if run natively (not as container):
 - jq
 - sed
 - getopt (util-linux)
+
 For notifications via ntfy:
 - curl
 - hostname (inetutils) `or set NTFY_HOSTNAME`
