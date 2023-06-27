@@ -3,6 +3,7 @@ Description=Container update check
 Requires=podman.socket
 Wants=network-online.target
 After=network-online.target
+After=podman-auto-update.service
 RequiresMountsFor=%t/containers
 
 [Service]
@@ -21,3 +22,6 @@ ProtectSystem=full
 PrivateTmp=true
 MemoryDenyWriteExecute=true
 NoNewPrivileges=true
+
+[Install]
+WantedBy=podman-auto-update.service

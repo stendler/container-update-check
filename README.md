@@ -65,7 +65,9 @@ Then enable and start the podman socket and timer for the current user:
 
 ```sh
 systemctl --user enable --now podman.socket
-systemctl --user enable --now container-check-update.timer
+systemctl --user enable --now container-check-update.timer # if running without podman-auto-update.timer
+# OR
+systemctl --user enable --now container-check-update.service # triggering after every podman-auto-update run
 ```
 
 Drop the `--user` to enable and start them for the system.
