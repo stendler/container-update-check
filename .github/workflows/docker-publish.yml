@@ -10,6 +10,9 @@ on:
     - cron: '27 17 * * *'
   push:
     branches: [ "main" ]
+    paths:
+      - 'Containerfile'
+      - '*.sh'
   pull_request:
     branches: [ "main" ]
 
