@@ -18,10 +18,10 @@ ExecStart=/usr/bin/podman run --rm \
 SuccessExitStatus=0 2
 
 # Hardening
-ProtectSystem=full
-PrivateTmp=true
-MemoryDenyWriteExecute=true
-NoNewPrivileges=true
+#ProtectSystem=full
+#PrivateTmp=true
+#MemoryDenyWriteExecute=true
+#NoNewPrivileges=true
 
 [Install]
 WantedBy=podman-auto-update.service
