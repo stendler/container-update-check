@@ -110,7 +110,8 @@ else
         # get the list of tags starting from the image_tag
         tag_list=$(echo "$remote_inspect" | jq ".RepoTags as \$tags | \$tags | index(\"${image_tag}\") as \$start | \$tags[\$start+1:]")
         echo "$tag_list"
-        message=$(echo "Possible update candidates: $tag_list" | head -c 4096)
+        # limit to less than 4096 to prevent turning the message into an attachment: https://docs.ntfy.sh/publish/#limitations
+        message=$(echo "Possible update candidates: $tag_list" | head -c 4095)
     fi
 fi
 
