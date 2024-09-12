@@ -15,6 +15,7 @@ on:
       - '*.sh'
   pull_request:
     branches: [ "main" ]
+  workflow_dispatch:  # click the button on Github repo!
 
 env:
   # Use docker.io for Docker Hub if empty
