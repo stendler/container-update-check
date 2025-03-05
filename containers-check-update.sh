@@ -64,6 +64,7 @@ for container in $($CONTAINER_CMD container ls -a --format '{{ .ID }}'); do
     image_tag=$(echo "$container_info" | jq -r ".[0].ImageName" | sed 's/.*://')
     image_repo=$(echo "$container_info" | jq -r ".[0].ImageName" | sed 's/:.*//')
     remote_tag=$(echo "$container_info" | jq -r ".[0].Config.Labels[\"${CONTAINER_UPDATE_LABEL}.tag\"]" 2>/dev/null | sed 's/^null$//' || echo "$image_tag")
+    regex=$(echo "$container_info" | jq -r ".[0].Config.Labels[\"${CONTAINER_UPDATE_LABEL}.regex\"]" 2>/dev/null | sed 's/^null$//')
     if [ -n "$latest" ]; then
         remote_tag="latest"
     fi
@@ -76,7 +77,7 @@ for container in $($CONTAINER_CMD container ls -a --format '{{ .ID }}'); do
 
     # updatecheck label is set, assuming we want to check for an update
     printf '[%s] ' "$container_name"
-    ./image-check-update.sh --ntfy-url="${ntfy_url:=$NTFY_URL}" --ntfy-topic="${ntfy_topic:=$NTFY_TOPIC}" --ntfy-email="${ntfy_email:=$NTFY_EMAIL}" "$image_repo" "$image_tag" "$remote_tag"
+    ./image-check-update.sh --ntfy-url="${ntfy_url:=$NTFY_URL}" --ntfy-topic="${ntfy_topic:=$NTFY_TOPIC}" --ntfy-email="${ntfy_email:=$NTFY_EMAIL}" --grep="$regex" "$image_repo" "$image_tag" "$remote_tag"
     
     #test -z "$ntfy_topic" && echo "[$container_name] Ntfy not configured" || echo "[$container_name] Notified via $ntfy_url/$ntfy_topic and $ntfy_email"
 done

@@ -128,6 +128,7 @@ Requires `image-check-update.sh` to be in the current working directory.
 The following container labels are utilized (substitute `updatecheck` with `$CONTAINER_UPDATE_LABEL` if set):
 - `updatecheck`: `true` to run the updatecheck, `false` or empty to not run the updatecheck
 - `updatecheck.tag`: remote image tag to check against, e.g. `stable` (defaulting to current tag)
+- `updatecheck.regex`: regex to filter the "newer" tags, after the current one with grep
 - `updatecheck.ntfy.topic`: topic to send the notification to (don't send a notification if not set or empty)
 - `updatecheck.ntfy.url`: url of an alternative ntfy instance (default `https://ntfy.sh`)
 - `updatecheck.ntfy.email`: also notify this email
@@ -141,8 +142,8 @@ podman run --rm \
   --volume $XDG_RUNTIME_DIR/podman:/run/podman:z \ 
   --env NTFY_USER=$USER \
   --env NTFY_HOSTNAME=$HOST \
-  -security-opt label=disable \
-  IMAGE
+  --security-opt label=disable \
+  ghcr.io/stendler/container-update-check
 ```
 
 ## Caveats

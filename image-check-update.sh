@@ -30,11 +30,12 @@ elif command -v docker 1>/dev/null; then
     CONTAINER_CMD="${CONTAINER_CMD:=docker}"
 fi
 
-OPTS=$(getopt --options qt: --longoptions quiet,docker,podman,ntfy-topic:,ntfy-email:,ntfy-url: -- "$@")
+OPTS=$(getopt --options qt:g: --longoptions quiet,docker,podman,grep:,ntfy-topic:,ntfy-email:,ntfy-url: -- "$@")
 eval set -- "$OPTS"
 while true; do
     case "$1" in
         -t|--ntfy-topic) NTFY_TOPIC="$2"; shift 2;;
+        -g|--grep) regex="$2"; shift 2;;
         --ntfy-email) NTFY_EMAIL="$2"; shift 2;;
         --ntfy-url) NTFY_URL="$2"; shift 2;;
         --podman) command -v podman 1>/dev/null && CONTAINER_CMD="podman" || exit 1; shift;;
@@ -108,7 +109,7 @@ else
     if [ -z "$quiet" ]; then
         echo >&2 "These tags could be newer:"
         # get the list of tags starting from the image_tag
-        tag_list=$(echo "$remote_inspect" | jq ".RepoTags as \$tags | \$tags | index(\"${image_tag}\") as \$start | \$tags[\$start+1:]")
+        tag_list=$(echo "$remote_inspect" | jq ".RepoTags as \$tags | \$tags | index(\"${image_tag}\") as \$start | \$tags[\$start+1:] | map(select(test(\"${regex}\")))")
         echo "$tag_list"
         # limit to less than 4096 to prevent turning the message into an attachment: https://docs.ntfy.sh/publish/#limitations
         message=$(echo "Possible update candidates: $tag_list" | head -c 4095)
