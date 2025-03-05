@@ -42,7 +42,7 @@ while true; do
         --docker) command -v docker 1>/dev/null && CONTAINER_CMD="docker" || exit 1; shift;;
         -q|--quiet) quiet=true; shift;; # still printing to stderr, but not to stdout
         --) shift; break;;
-        *) echo "Unkown argument: $1"; exit 1;;
+        *) echo "Unknown argument: $1"; exit 1;;
     esac
 done
 
