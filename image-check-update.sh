@@ -74,7 +74,7 @@ if [ -n "$3" ]; then
     remote_tag="$3"
 fi
 
-local_digest=$($CONTAINER_CMD image inspect "$repo:$image_tag" | jq -r '.[0].Digest')
+local_digest=$($CONTAINER_CMD image ls --all --digests --format '{{ .Digest }}' --no-trunc --filter "reference=$repo:$image_tag" | head -n 1)
 if [ -z "$local_digest" ]; then
     echo >&2 "No local image exists with this tag. Check $CONTAINER_CMD image ls"
     exit 1
