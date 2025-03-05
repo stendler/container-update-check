@@ -80,14 +80,14 @@ if [ -z "$local_digest" ]; then
     exit 1
 fi
 remote_inspect=$(skopeo inspect "docker://$repo:$remote_tag")
-remote_layers=$(echo "$remote_inspect" | jq -r '.Layers')
+remote_layers=$(echo "$remote_inspect" | jq --raw-output '.Layers')
 if [ -z "$remote_layers" ]; then
     exit 1 # no error message needed, was probably already printed to stderr
 fi
 
 # this may throw an error if the manifest does not exist on the remote anymore - but that means, an update is probably available
 local_inspect=$(skopeo inspect "docker://$repo@$local_digest")
-local_layers=$(echo "$local_inspect" | jq -r '.Layers')
+local_layers=$(echo "$local_inspect" | jq --raw-output '.Layers')
 
 if [ "$remote_layers" = "$local_layers" ]; then
     if [ "$remote_tag" = "$image_tag" ]; then
@@ -119,12 +119,12 @@ fi
 if [ -n "$NTFY_TOPIC" ]; then
     if [ -n "$NTFY_EMAIL" ]; then
         NTFY_EMAIL="Email: $NTFY_EMAIL"
-        ntfy_mail_header="-H"
+        ntfy_mail_header="--header"
     fi
 
-    curl >/dev/null 2>&1 -H "Tags: whale" -H "Firebase: no" "$ntfy_mail_header" "$NTFY_EMAIL" \
-    -H "Title: ${NTFY_USER:=$(whoami)}@${NTFY_HOSTNAME:=$(hostname)}: $repo:$image_tag is outdated compared to remote tag '$remote_tag'" \
-    -d "$message" "${NTFY_URL:=https://ntfy.sh}/$NTFY_TOPIC"
+    curl >/dev/null 2>&1 --header "Tags: whale" --header "Firebase: no" "$ntfy_mail_header" "$NTFY_EMAIL" \
+    --header "Title: ${NTFY_USER:=$(whoami)}@${NTFY_HOSTNAME:=$(hostname)}: $repo:$image_tag is outdated compared to remote tag '$remote_tag'" \
+    --data "$message" "${NTFY_URL:=https://ntfy.sh}/$NTFY_TOPIC"
 fi
 
 exit 2

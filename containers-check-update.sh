@@ -43,13 +43,14 @@ if [ -n "$SOCKET_URL" ]; then
     fi
 fi
 
+# pass CONTAINER_CMD to image-check-update.sh
 export CONTAINER_CMD
 
-for container in $($CONTAINER_CMD container ls -a --format '{{ .ID }}'); do
+for container in $($CONTAINER_CMD container ls --all --format '{{ .ID }}'); do
     # check for the labels
-    container_info=$($CONTAINER_CMD container inspect "$container" --format '{{ json }}')
-    updatecheck=$(echo "$container_info" | jq -r ".[0].Config.Labels[\"${CONTAINER_UPDATE_LABEL}\"]" 2>/dev/null)
-    container_name=$(echo "$container_info" | jq -r ".[0].Name" 2>/dev/null)
+    container_info=$($CONTAINER_CMD container inspect "$container" --format '{{ json . }}')
+    updatecheck=$(echo "$container_info" | jq --raw-output ".Config.Labels[\"${CONTAINER_UPDATE_LABEL}\"]" 2>/dev/null)
+    container_name=$(echo "$container_info" | jq --raw-output ".Name" 2>/dev/null)
 
     #echo "[Debug] '$updatecheck' $(test -z $updatecheck && echo empty || echo not empty)"
     if [ -z "$force" ]; then
@@ -61,17 +62,17 @@ for container in $($CONTAINER_CMD container ls -a --format '{{ .ID }}'); do
         echo "[Debug] force is set"
     fi
 
-    image_tag=$(echo "$container_info" | jq -r ".[0].ImageName" | sed 's/.*://')
-    image_repo=$(echo "$container_info" | jq -r ".[0].ImageName" | sed 's/:.*//')
-    remote_tag=$(echo "$container_info" | jq -r ".[0].Config.Labels[\"${CONTAINER_UPDATE_LABEL}.tag\"]" 2>/dev/null | sed 's/^null$//' || echo "$image_tag")
-    regex=$(echo "$container_info" | jq -r ".[0].Config.Labels[\"${CONTAINER_UPDATE_LABEL}.regex\"]" 2>/dev/null | sed 's/^null$//')
+    image_tag=$(echo "$container_info" | jq --raw-output ".[0].ImageName" | sed 's/.*://')
+    image_repo=$(echo "$container_info" | jq --raw-output ".[0].ImageName" | sed 's/:.*//')
+    remote_tag=$(echo "$container_info" | jq --raw-output ".[0].Config.Labels[\"${CONTAINER_UPDATE_LABEL}.tag\"]" 2>/dev/null | sed 's/^null$//' || echo "$image_tag")
+    regex=$(echo "$container_info" | jq --raw-output ".[0].Config.Labels[\"${CONTAINER_UPDATE_LABEL}.regex\"]" 2>/dev/null | sed 's/^null$//')
     if [ -n "$latest" ]; then
         remote_tag="latest"
     fi
     : "${remote_tag:=$image_tag}" # set default if empty    
-    ntfy_url=$(echo "$container_info" | jq -r ".[0].Config.Labels[\"${CONTAINER_UPDATE_LABEL}.ntfy.url\"]" 2>/dev/null | sed 's/^null$//')
-    ntfy_topic=$(echo "$container_info" | jq -r ".[0].Config.Labels[\"${CONTAINER_UPDATE_LABEL}.ntfy.topic\"]" 2>/dev/null | sed 's/^null$//')
-    ntfy_email=$(echo "$container_info" | jq -r ".[0].Config.Labels[\"${CONTAINER_UPDATE_LABEL}.ntfy.email\"]" 2>/dev/null | sed 's/^null$//')
+    ntfy_url=$(echo "$container_info" | jq --raw-output ".[0].Config.Labels[\"${CONTAINER_UPDATE_LABEL}.ntfy.url\"]" 2>/dev/null | sed 's/^null$//')
+    ntfy_topic=$(echo "$container_info" | jq --raw-output ".[0].Config.Labels[\"${CONTAINER_UPDATE_LABEL}.ntfy.topic\"]" 2>/dev/null | sed 's/^null$//')
+    ntfy_email=$(echo "$container_info" | jq --raw-output ".[0].Config.Labels[\"${CONTAINER_UPDATE_LABEL}.ntfy.email\"]" 2>/dev/null | sed 's/^null$//')
 
     echo "[$container_name] Checking $image_repo:$image_tag against tag $remote_tag"
 
