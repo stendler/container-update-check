@@ -55,7 +55,7 @@ for container in $($CONTAINER_CMD container ls --all --format '{{ .ID }}'); do
     #echo "[Debug] '$updatecheck' $(test -z $updatecheck && echo empty || echo not empty)"
     if [ -z "$force" ]; then
         case "$updatecheck" in
-            0|false|False|null|NULL|no|No|NO) echo "[$container_name] not configured to update: updatecheck = '$updatecheck'"; continue;;
+            0|false|False|FALSE|null|NULL|Null|no|No|NO|'') echo "[$container_name] not configured to update: updatecheck = '$updatecheck'"; continue;;
             *) echo "[$container_name] updatecheck set to '$updatecheck'";;
         esac
     else
